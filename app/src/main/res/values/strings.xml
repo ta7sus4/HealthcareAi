@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">HealthcareAi</string>
+    <string name="start_chat">チャットをはじめる</string>
+    <string name="start_diagnosis">診断をはじめる</string>
+    <string name="diagnosis">診断</string>
+    <string name="first_message">こんにちは！何かお困りですか？</string>
+
+
+</resources>
