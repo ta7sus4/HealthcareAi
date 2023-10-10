@@ -1,6 +1,7 @@
 package jp.ta7sus4.healthcareai
 
 import android.os.StrictMode
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -88,7 +89,10 @@ class ChatViewModel: ViewModel() {
             } else {
                 connection.errorStream
             }
-            if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) return "問題が発生しました。再度お試しください。"
+            if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                Log.d("ChatViewModel", "Error: ${stream.bufferedReader().use { it.readText() }}")
+                return "問題が発生しました。再度お試しください。"
+            }
 
             val result = stream.bufferedReader().use { it.readText() }
             println(result)
