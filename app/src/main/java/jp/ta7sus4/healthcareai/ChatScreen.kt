@@ -32,10 +32,11 @@ private const val FIRST_MESSAGE = "こんにちは！何かお困りですか？
 @Composable
 fun ChatScreen(
     viewModel: ChatViewModel,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    Box {
+    Box(modifier = modifier) {
         Messages(viewModel = viewModel)
         Row(
             modifier = Modifier

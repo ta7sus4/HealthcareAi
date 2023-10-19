@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Messages(
     viewModel: ChatViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val messages: List<ChatMessage> by viewModel.messages
     val listState = rememberLazyListState()
@@ -25,7 +26,7 @@ fun Messages(
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(vertical = 16.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(bottom = 70.dp),
     ) {
@@ -38,5 +39,5 @@ fun Messages(
 @Preview(showBackground = true)
 @Composable
 fun MsgsPrev() {
-    Messages(ChatViewModel())
+    Messages(viewModel = ChatViewModel())
 }

@@ -17,10 +17,11 @@ import jp.ta7sus4.healthcareai.ui.theme.HealthcareAiTheme
 
 @Composable
 fun MainScreen(
+    modifier: Modifier = Modifier,
     navHostController: NavHostController? = null,
 ) {
     Column(
-        Modifier.fillMaxSize(),
+        modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))

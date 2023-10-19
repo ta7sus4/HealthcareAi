@@ -21,9 +21,10 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun Message(
     message: ChatMessage,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
             .fillMaxWidth(),
         horizontalArrangement = if (message.isMe) Arrangement.End else Arrangement.Start,

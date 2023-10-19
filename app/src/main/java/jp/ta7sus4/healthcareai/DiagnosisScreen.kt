@@ -1,5 +1,6 @@
 package jp.ta7sus4.healthcareai
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,20 +22,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun DiagnosisScreen() {
+fun DiagnosisScreen(
+    modifier: Modifier = Modifier,
+    question: String = stringResource(R.string.diagnosis),
+    onClickYes: () -> Unit = {},
+    onClickNo: () -> Unit = {},
+) {
     Column(
-        Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize()
     ) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = stringResource(R.string.diagnosis),
+            text = question,
             modifier = Modifier.weight(1f),
             fontSize = 30.sp,
         )
         Spacer(modifier = Modifier.weight(1f))
-        val radioOptions = listOf("A", "B", "C")
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1]) }
+        val radioOptions = listOf("Yes", "No")
+        val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -48,6 +54,13 @@ fun DiagnosisScreen() {
                                 onOptionSelected(text)
                             }
                         )
+                        .clickable(onClick = {
+                            if (text == "Yes") {
+                                onClickYes()
+                            } else {
+                                onClickNo()
+                            }
+                        })
                         .padding(horizontal = 16.dp),
                 ) {
                     RadioButton(
