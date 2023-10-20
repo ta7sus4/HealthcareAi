@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +49,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigator() {
-    val viewModel = ChatViewModel()
+    val chatViewModel = ChatViewModel()
+    val diagnosisViewModel = DiagnosisViewModel()
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController) },
@@ -64,8 +65,8 @@ fun MainNavigator() {
                     navHostController = navController,
                 )
             }
-            composable("chat") { ChatScreen(viewModel = viewModel) }
-            composable("diagnosis") { DiagnosisScreen() }
+            composable("chat") { ChatScreen(viewModel = chatViewModel) }
+            composable("diagnosis") { DiagnosisStartScreen(viewModel = diagnosisViewModel) }
         }
     }
 }
@@ -93,7 +94,7 @@ fun BottomBar(
             }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Filled.Check, contentDescription = null) },
+            icon = { Icon(Icons.Filled.List, contentDescription = null) },
             selected = false,
             onClick = {
                 navHostController.navigate("diagnosis")
