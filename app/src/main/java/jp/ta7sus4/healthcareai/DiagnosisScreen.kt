@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +35,7 @@ fun DiagnosisScreen(
         Text(
             text = question,
             modifier = Modifier.weight(1f),
-            fontSize = 30.sp,
+            fontSize = 24.sp,
         )
         Spacer(modifier = Modifier.weight(1f))
         val radioOptions = listOf("Yes", "No")
@@ -69,7 +68,7 @@ fun DiagnosisScreen(
                     )
                     Text(
                         text = text,
-                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 18.sp,
                         modifier = Modifier.padding(top = 12.dp)
                     )
                 }
