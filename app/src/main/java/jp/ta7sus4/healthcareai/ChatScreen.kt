@@ -1,5 +1,6 @@
 package jp.ta7sus4.healthcareai
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,7 +44,8 @@ fun ChatScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(4.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .background(Color.White),
         ) {
             var input by rememberSaveable { mutableStateOf("") }
             IconButton(
