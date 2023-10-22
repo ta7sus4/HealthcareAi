@@ -82,7 +82,7 @@ class ChatViewModel: ViewModel() {
             connection.connect()
 
             val code = connection.responseCode
-            println(code) // Print HTTP response code for debug purposes.
+            println(code)
 
             val stream = if (connection.responseCode < HttpURLConnection.HTTP_BAD_REQUEST) {
                 connection.inputStream
@@ -107,3 +107,8 @@ class ChatViewModel: ViewModel() {
         }
     }
 }
+
+data class ChatMessage(
+    val text: String,
+    val isMe: Boolean,
+)

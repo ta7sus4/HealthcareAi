@@ -16,7 +16,9 @@ fun DiagnosisStartScreen(
     viewModel: DiagnosisViewModel,
     modifier: Modifier = Modifier,
 ) {
-    if (viewModel.isStart) {
+    if (viewModel.isResult){
+        DiagnosisResultScreen(viewModel = viewModel)
+    } else if (viewModel.isStart) {
         DiagnosisScreen(viewModel = viewModel)
     } else {
         Column(
@@ -26,13 +28,13 @@ fun DiagnosisStartScreen(
             Spacer(Modifier.weight(2f))
             Text(
                 text = "診断",
-                fontSize = 30.sp
+                fontSize = 30.sp,
             )
             Spacer(Modifier.weight(0.2f))
             Text(text = "気持ちの健康を数値化します")
             Spacer(Modifier.weight(2f))
             OutlinedButton(onClick = { viewModel.startButtonPressed() }) {
-                Text(text = "診断をはじめる")
+                Text(text = if (viewModel.isLoading) "質問を考えています..." else "診断をはじめる")
             }
             Spacer(Modifier.weight(1f))
         }

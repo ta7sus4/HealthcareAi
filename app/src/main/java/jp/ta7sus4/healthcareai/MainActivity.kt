@@ -24,12 +24,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import jp.ta7sus4.healthcareai.ui.theme.HealthcareAiTheme
 
-
-data class ChatMessage(
-    val text: String,
-    val isMe: Boolean,
-)
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
