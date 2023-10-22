@@ -12,6 +12,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 private const val FIRST_MESSAGE = "こんにちは！何かお困りですか？"
+private const val ERROR_MESSAGE = "問題が発生しました。再度お試しください。"
+private const val THINKING = "考えています..."
+
 
 class ChatViewModel: ViewModel() {
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
@@ -27,15 +30,13 @@ class ChatViewModel: ViewModel() {
 
     fun sendMessage(message: ChatMessage) {
         addMessage(message)
-        addMessage(ChatMessage(text = "考えています...", isMe = false))
+        addMessage(ChatMessage(text = THINKING, isMe = false))
         viewModelScope.launch {
-            val responseMessage = makeHttpRequest()
-            deleteLastMessage()
-            addMessage(ChatMessage(text = responseMessage, isMe = false))
+            makeHttpRequest()
         }
     }
 
-    private fun makeHttpRequest(): String {
+    private fun makeHttpRequest(){
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
@@ -67,8 +68,8 @@ class ChatViewModel: ViewModel() {
                     {
                         "model": "gpt-3.5-turbo",
                         "messages": 
-                        [${jsonInputStringContent.dropLast(1)}]
-                        
+                        [${jsonInputStringContent.dropLast(1)}],
+                        "stream": true
                     }
                 """.trimIndent().replace(" ", "").replace("\n", "")
             println(jsonInputString)
@@ -89,21 +90,42 @@ class ChatViewModel: ViewModel() {
             } else {
                 connection.errorStream
             }
+
             if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 Log.d("ChatViewModel", "Error: ${stream.bufferedReader().use { it.readText() }}")
-                return "問題が発生しました。再度お試しください。"
+                if (messages.value.last().text == THINKING) {
+                    deleteLastMessage()
+                }
+                addMessage(ChatMessage(text = ERROR_MESSAGE + "(${stream.bufferedReader().use { it.readText() }})", isMe = false))
+                return
             }
 
-            val result = stream.bufferedReader().use { it.readText() }
-            println(result)
-            val jsonObject = JSONObject(result)
-            val choices = jsonObject.getJSONArray("choices")
-            val firstChoice = choices.getJSONObject(0)
-            val message = firstChoice.getJSONObject("message")
-            return message.getString("content")
+            val bufferedReader = stream.bufferedReader()
+            var line: String?
+            while (bufferedReader.readLine().also { line = it } != null) {
+
+                println("Received line: $line")
+
+                if (line!!.length > 5 && line!!.contains("content")) {
+                    val jsonObject = JSONObject(line?.substring(5) ?: "")
+                    val choices = jsonObject.getJSONArray("choices")
+                    val firstChoice = choices.getJSONObject(0)
+                    val message = firstChoice.getJSONObject("delta")
+                    val content = message.getString("content")
+                    var lastMessage = messages.value.last().text
+                    if (lastMessage == THINKING){
+                        lastMessage = ""
+                    }
+                    messages.value = messages.value.dropLast(1) + ChatMessage(text = lastMessage + content, isMe = false)
+                }
+            }
         } catch (e: Exception) {
             println(e)
-            return "問題が発生しました。再度お試しください。(${e.message})"
+            if (messages.value.last().text == THINKING) {
+                deleteLastMessage()
+            }
+            addMessage(ChatMessage(text = ERROR_MESSAGE + "(${e.message})", isMe = false))
+            return
         }
     }
 }

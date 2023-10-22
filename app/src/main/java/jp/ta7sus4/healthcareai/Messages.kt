@@ -20,8 +20,8 @@ fun Messages(
 ) {
     val messages: List<ChatMessage> by viewModel.messages
     val listState = rememberLazyListState()
-    LaunchedEffect(key1 = messages.size) {
-        listState.animateScrollToItem(index = messages.size - 1)
+    LaunchedEffect(key1 = messages.last()) {
+        listState.animateScrollToItem(index = listState.layoutInfo.totalItemsCount)
     }
     LazyColumn(
         state = listState,
