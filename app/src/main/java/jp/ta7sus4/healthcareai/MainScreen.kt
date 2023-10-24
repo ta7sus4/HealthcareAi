@@ -30,13 +30,12 @@ fun MainScreen(
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "アプリ名",
-            modifier = Modifier.weight(1f),
             fontSize = 30.sp,
         )
+        Spacer(modifier = Modifier.weight(1f))
         OutlinedButton(
             onClick = { navHostController?.navigate("chat") },
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-            modifier = Modifier.weight(0.2f),
         ) {
             Text(text = stringResource(R.string.start_chat))
         }
@@ -44,7 +43,6 @@ fun MainScreen(
         OutlinedButton(
             onClick = { navHostController?.navigate("diagnosis") },
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-            modifier = Modifier.weight(0.2f),
         ) {
             Text(text = stringResource(R.string.start_diagnosis))
         }
