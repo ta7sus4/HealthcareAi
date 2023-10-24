@@ -49,7 +49,7 @@ class ChatViewModel: ViewModel() {
                 setRequestProperty("Content-Type", "application/json")
                 setRequestProperty(
                     "Authorization",
-                    "Bearer " + BuildConfig.aki_key
+                    "Bearer " + BuildConfig.api_key
                 )
                 doOutput = true
             }
