@@ -5,7 +5,7 @@ APIキーの追加
 
 `local.properties`に以下を追記
 ```
-aki_key="ここにキーを記載"
+api_key="ここにキーを記載"
 ```
 
 ## ブランチ名
