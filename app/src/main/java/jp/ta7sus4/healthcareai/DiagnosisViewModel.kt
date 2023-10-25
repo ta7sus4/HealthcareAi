@@ -28,6 +28,13 @@ class DiagnosisViewModel: ViewModel(){
     private var questions = mutableListOf<Question>()
     private var count by mutableStateOf(0)
 
+    private var _resultMessage = mutableStateOf("読み込み中...")
+    val resultMessage: String by _resultMessage
+
+    private var _resultScore = mutableStateOf(-1)
+    val resultScore by _resultScore
+
+
     private val requestMessage = "今の気持ちの健康を数値化するはい/いいえで答えられる質問を9個考えて"
     private var aiResponse = ""
 
@@ -40,6 +47,8 @@ class DiagnosisViewModel: ViewModel(){
             count = 0
             _isStart.value = true
             _isLoading.value = false
+            _resultMessage.value = "読み込み中..."
+            _resultScore.value = -1
         }
     }
 
@@ -70,25 +79,39 @@ class DiagnosisViewModel: ViewModel(){
 
     private fun showResult() {
         _isResult.value = true
+        resultString()
     }
 
-    fun resultScore(): String {
-        if (questions.isEmpty()) return "***"
-        return "${ 100 * questions.count { it.answer == true } / questions.count() }"
+    private fun resultScore() {
+        viewModelScope.launch {
+            _resultScore.value = makeHttpRequest(
+                listOf(
+                    ChatMessage(
+                        text = "以下のユーザに対する評価の文からスコアを0-9999の範囲で点数をつけて推測して「0000」のように表して\n\n" + _resultMessage.value,
+                        isMe = true
+                    ),
+                )
+            ).filter { it.isDigit() }.toIntOrNull() ?: -2
+            if (_resultScore.value >= 10000) {
+                _resultScore.value /= 10000
+            }
+        }
     }
-    fun resultString(): String {
-        if (questions.isEmpty()) return "テスト".repeat(60)
+    private fun resultString() {
+        if (questions.isEmpty()) return
         val query = questions.mapIndexed { index, it ->
             "${index + 1}: Q:${it.question} A:${if (it.answer == true) "はい" else "いいえ"}\n"
         }
-        val result = makeHttpRequest(
-            listOf(
-                ChatMessage(text = requestMessage, isMe = true),
-                ChatMessage(text = aiResponse, isMe = false),
-                ChatMessage(text = "100文字以内でアドバイスして$query\n", isMe = true),
+        viewModelScope.launch {
+            _resultMessage.value = makeHttpRequest(
+                listOf(
+                    ChatMessage(text = requestMessage, isMe = true),
+                    ChatMessage(text = aiResponse, isMe = false),
+                    ChatMessage(text = "100文字以内でアドバイスして$query\n", isMe = true),
+                )
             )
-        )
-        return result
+            resultScore()
+        }
     }
 
     private fun endDiagnosis() {

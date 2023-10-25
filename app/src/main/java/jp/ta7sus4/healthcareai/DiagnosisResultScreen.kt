@@ -2,21 +2,16 @@ package jp.ta7sus4.healthcareai
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -60,7 +55,7 @@ fun DiagnosisResultScreen(
         )
         Spacer(modifier = Modifier.weight(0.2f))
         Text(
-            text = "${viewModel.resultScore()} / 100",
+            text = "${if (viewModel.resultScore == -1) "計算中..." else viewModel.resultScore}",
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -68,17 +63,14 @@ fun DiagnosisResultScreen(
                 .weight(1f),
         )
         Spacer(modifier = Modifier.weight(0.2f))
-        var resultSting by rememberSaveable { mutableStateOf("") }
-        LaunchedEffect(Unit){
-            resultSting = viewModel.resultString()
-        }
+
         Text(
-            text = if (resultSting.isEmpty()) "読み込み中..." else resultSting,
+            text = viewModel.resultMessage,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
-                .wrapContentHeight()
-                .padding(horizontal = 20.dp),
+                .defaultMinSize(minHeight = 150.dp)
+                .padding(horizontal = 20.dp)
         )
         Spacer(modifier = Modifier.weight(0.3f))
     }
