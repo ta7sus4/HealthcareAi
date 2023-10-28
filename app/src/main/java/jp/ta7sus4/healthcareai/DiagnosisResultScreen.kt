@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,9 +31,7 @@ fun DiagnosisResultScreen(
         modifier = modifier.fillMaxSize()
     ) {
         IconButton(
-            onClick = {
-                viewModel.endButtonPressed()
-            },
+            onClick = { viewModel.endButtonPressed() },
             modifier = Modifier
                 .padding(12.dp)
                 .size(25.dp)
@@ -46,7 +45,7 @@ fun DiagnosisResultScreen(
         }
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
-            text = "結果",
+            text = stringResource(id = R.string.result),
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -55,7 +54,11 @@ fun DiagnosisResultScreen(
         )
         Spacer(modifier = Modifier.weight(0.2f))
         Text(
-            text = "${if (viewModel.resultScore == -1) "計算中..." else viewModel.resultScore}",
+            text = when (viewModel.resultScore) {
+                -1 -> stringResource(id = R.string.scoring)
+                -2 -> stringResource(id = R.string.failed_fetch)
+                else -> "${stringResource(id = R.string.score)}: ${viewModel.resultScore}"
+            },
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier

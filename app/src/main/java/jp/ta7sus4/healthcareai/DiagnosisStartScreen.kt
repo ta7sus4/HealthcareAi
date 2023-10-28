@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
@@ -27,14 +28,16 @@ fun DiagnosisStartScreen(
         ) {
             Spacer(Modifier.weight(2f))
             Text(
-                text = "診断",
+                text = stringResource(id = R.string.diagnosis),
                 fontSize = 30.sp,
             )
             Spacer(Modifier.weight(0.2f))
-            Text(text = "気持ちの健康を数値化します")
+            Text(text = stringResource(id = R.string.diagnosis_description))
             Spacer(Modifier.weight(2f))
             OutlinedButton(onClick = { viewModel.startButtonPressed() }) {
-                Text(text = if (viewModel.isLoading) "質問を考えています..." else "診断をはじめる")
+                Text(
+                    text = if (viewModel.isLoading) stringResource(id = R.string.thinking_question) else stringResource(id = R.string.start_diagnosis)
+                )
             }
             Spacer(Modifier.weight(1f))
         }

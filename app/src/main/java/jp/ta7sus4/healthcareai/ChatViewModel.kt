@@ -11,14 +11,16 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-private const val FIRST_MESSAGE = "こんにちは！何かお困りですか？"
-private const val ERROR_MESSAGE = "問題が発生しました。再度お試しください。"
-private const val THINKING = "考えています..."
-
-
 class ChatViewModel: ViewModel() {
+
+    companion object{
+        private const val TEXT_FIRST_MESSAGE = "こんにちは！何かお困りですか？"
+        private const val TEXT_ERROR = "問題が発生しました。再度お試しください。"
+        private const val TEXT_THINKING = "考えています..."
+    }
+
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
-    var messages = mutableStateOf(listOf(ChatMessage(text = FIRST_MESSAGE, isMe = false)))
+    var messages = mutableStateOf(listOf(ChatMessage(text = TEXT_FIRST_MESSAGE, isMe = false)))
 
     private fun addMessage(message: ChatMessage) {
         messages.value = messages.value + message
@@ -30,7 +32,7 @@ class ChatViewModel: ViewModel() {
 
     fun sendMessage(message: ChatMessage) {
         addMessage(message)
-        addMessage(ChatMessage(text = THINKING, isMe = false))
+        addMessage(ChatMessage(text = TEXT_THINKING, isMe = false))
         viewModelScope.launch {
             makeHttpRequest()
         }
@@ -58,7 +60,7 @@ class ChatViewModel: ViewModel() {
             messages.value.dropLast(1).forEach {
                 jsonInputStringContent += """
                         { "role": "${if (it.isMe) "user" else "assistant"}",
-                          "content": "${it.text}"
+                          "content": "${it.text.replace("\"", "'")}"
                         },
                     """.trimIndent()
             }
@@ -82,8 +84,7 @@ class ChatViewModel: ViewModel() {
 
             connection.connect()
 
-            val code = connection.responseCode
-            println(code)
+            println(connection.responseCode)
 
             val stream = if (connection.responseCode < HttpURLConnection.HTTP_BAD_REQUEST) {
                 connection.inputStream
@@ -93,10 +94,10 @@ class ChatViewModel: ViewModel() {
 
             if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 Log.d("ChatViewModel", "Error: ${stream.bufferedReader().use { it.readText() }}")
-                if (messages.value.last().text == THINKING) {
+                if (messages.value.last().text == TEXT_THINKING) {
                     deleteLastMessage()
                 }
-                addMessage(ChatMessage(text = ERROR_MESSAGE + "(${stream.bufferedReader().use { it.readText() }})", isMe = false))
+                addMessage(ChatMessage(text = TEXT_ERROR + "(${stream.bufferedReader().use { it.readText() }})", isMe = false))
                 return
             }
 
@@ -113,7 +114,7 @@ class ChatViewModel: ViewModel() {
                     val message = firstChoice.getJSONObject("delta")
                     val content = message.getString("content")
                     var lastMessage = messages.value.last().text
-                    if (lastMessage == THINKING){
+                    if (lastMessage == TEXT_THINKING){
                         lastMessage = ""
                     }
                     messages.value = messages.value.dropLast(1) + ChatMessage(text = lastMessage + content, isMe = false)
@@ -121,10 +122,10 @@ class ChatViewModel: ViewModel() {
             }
         } catch (e: Exception) {
             println(e)
-            if (messages.value.last().text == THINKING) {
+            if (messages.value.last().text == TEXT_THINKING) {
                 deleteLastMessage()
             }
-            addMessage(ChatMessage(text = ERROR_MESSAGE + "(${e.message})", isMe = false))
+            addMessage(ChatMessage(text = TEXT_ERROR + "(${e.message})", isMe = false))
             return
         }
     }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,7 +68,7 @@ fun DiagnosisScreen(
                 onClick = { viewModel.onClickNo() },
             ) {
                 Text(
-                    text = "いいえ",
+                    text = stringResource(id = R.string.no),
                     color = Color.Black,
                     fontSize = 18.sp,
                 )
@@ -77,7 +78,7 @@ fun DiagnosisScreen(
                 onClick = { viewModel.onClickYes() },
             ) {
                 Text(
-                    text = " はい ",
+                    text = " ${stringResource(id = R.string.no)} ",
                     color = Color.Black,
                     fontSize = 18.sp,
                 )

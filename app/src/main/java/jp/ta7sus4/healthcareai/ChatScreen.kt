@@ -24,11 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-
-private const val FIRST_MESSAGE = "こんにちは！何かお困りですか？"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,10 +47,11 @@ fun ChatScreen(
                 .background(Color.White),
         ) {
             var input by rememberSaveable { mutableStateOf("") }
+            val firstMessage = stringResource(id = R.string.first_message)
             IconButton(
                 onClick = {
                     viewModel.messages.value =
-                        listOf(ChatMessage(text = FIRST_MESSAGE, isMe = false))
+                        listOf(ChatMessage(text = firstMessage, isMe = false))
                 },
                 modifier = Modifier
                     .padding(12.dp)

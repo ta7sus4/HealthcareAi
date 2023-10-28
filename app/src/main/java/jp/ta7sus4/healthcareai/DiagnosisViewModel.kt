@@ -14,6 +14,15 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class DiagnosisViewModel: ViewModel(){
+    companion object {
+        private const val TRY_MAX_COUNT = 5
+        private const val TEXT_LOADING = "読み込み中..."
+        private const val TEXT_REQUEST_QUESTION = "今の気持ちの健康を数値化するはい/いいえで答えられる質問を9個考えて"
+        private const val TEXT_REQUEST_SCORE = "以下のユーザに対する評価の文からスコアを0-9999の範囲で点数をつけて推測して必ず「XXXX」のように表して:"
+        private const val TEXT_REQUEST_ADVICE = "100文字以内でアドバイスして"
+        private const val TEXT_ERROR = "問題が発生しました。再度お試しください"
+    }
+
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
 
     private val _isStart = mutableStateOf(false)
@@ -28,14 +37,13 @@ class DiagnosisViewModel: ViewModel(){
     private var questions = mutableListOf<Question>()
     private var count by mutableStateOf(0)
 
-    private var _resultMessage = mutableStateOf("読み込み中...")
+    private var _resultMessage = mutableStateOf(TEXT_LOADING)
     val resultMessage: String by _resultMessage
 
     private var _resultScore = mutableStateOf(-1)
     val resultScore by _resultScore
 
 
-    private val requestMessage = "今の気持ちの健康を数値化するはい/いいえで答えられる質問を9個考えて"
     private var aiResponse = ""
 
     fun startButtonPressed() {
@@ -47,7 +55,7 @@ class DiagnosisViewModel: ViewModel(){
             count = 0
             _isStart.value = true
             _isLoading.value = false
-            _resultMessage.value = "読み込み中..."
+            _resultMessage.value = TEXT_LOADING
             _resultScore.value = -1
         }
     }
@@ -72,9 +80,9 @@ class DiagnosisViewModel: ViewModel(){
     }
 
     fun currentQuestion(): String {
-        if (_isResult.value) return "読み込み中..."
+        if (_isResult.value) return TEXT_LOADING
         if (questions.size <= count) { showResult() }
-        return questions.getOrNull(count)?.question ?: "読み込み中..."
+        return questions.getOrNull(count)?.question ?: TEXT_LOADING
     }
 
     private fun showResult() {
@@ -83,17 +91,27 @@ class DiagnosisViewModel: ViewModel(){
     }
 
     private fun resultScore() {
-        viewModelScope.launch {
-            _resultScore.value = makeHttpRequest(
-                listOf(
-                    ChatMessage(
-                        text = "以下のユーザに対する評価の文からスコアを0-9999の範囲で点数をつけて推測して「0000」のように表して\n\n" + _resultMessage.value,
-                        isMe = true
-                    ),
-                )
-            ).filter { it.isDigit() }.toIntOrNull() ?: -2
-            if (_resultScore.value >= 10000) {
-                _resultScore.value /= 10000
+        val scores = mutableListOf<Int>(-1, -1, -1)
+        for (i in 0..2) {
+            viewModelScope.launch {
+                var tryCount = TRY_MAX_COUNT
+                while (scores[i] < 0) {
+                    scores[i] = makeHttpRequest(
+                        listOf(
+                            ChatMessage(
+                                text = TEXT_REQUEST_SCORE + _resultMessage.value,
+                                isMe = true
+                            ),
+                        )
+                    ).filter { it.isDigit() }.toIntOrNull() ?: -2
+                    tryCount--
+                    if (tryCount <= 0){
+                        scores[i] = 5000
+                        break
+                    }
+                }
+                if (scores[i] >= 10000) scores[i] /= 10000
+                if (scores.all { it >= 0 }) _resultScore.value = scores.average().toInt()
             }
         }
     }
@@ -103,13 +121,18 @@ class DiagnosisViewModel: ViewModel(){
             "${index + 1}: Q:${it.question} A:${if (it.answer == true) "はい" else "いいえ"}\n"
         }
         viewModelScope.launch {
-            _resultMessage.value = makeHttpRequest(
-                listOf(
-                    ChatMessage(text = requestMessage, isMe = true),
-                    ChatMessage(text = aiResponse, isMe = false),
-                    ChatMessage(text = "100文字以内でアドバイスして$query\n", isMe = true),
+            var tryCount = TRY_MAX_COUNT
+            while (_resultMessage.value.length !in 21..400) {
+                _resultMessage.value = makeHttpRequest(
+                    listOf(
+                        ChatMessage(text = TEXT_REQUEST_QUESTION, isMe = true),
+                        ChatMessage(text = aiResponse, isMe = false),
+                        ChatMessage(text = "$TEXT_REQUEST_ADVICE:$query\n", isMe = true),
+                    )
                 )
-            )
+                tryCount--
+                if (tryCount <= 0) break
+            }
             resultScore()
         }
     }
@@ -123,7 +146,7 @@ class DiagnosisViewModel: ViewModel(){
     private fun createQuestion() {
         aiResponse = makeHttpRequest(
             listOf(
-                ChatMessage(text = requestMessage, isMe = true)
+                ChatMessage(text = TEXT_REQUEST_QUESTION, isMe = true)
             )
         )
         val questionListResponse = aiResponse.split("\n")
@@ -182,8 +205,7 @@ class DiagnosisViewModel: ViewModel(){
 
             connection.connect()
 
-            val code = connection.responseCode
-            println(code)
+            println(connection.responseCode)
 
             val stream = if (connection.responseCode < HttpURLConnection.HTTP_BAD_REQUEST) {
                 connection.inputStream
@@ -192,7 +214,7 @@ class DiagnosisViewModel: ViewModel(){
             }
             if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 Log.d("ChatViewModel", "Error: ${stream.bufferedReader().use { it.readText() }}")
-                return "問題が発生しました。再度お試しください。"
+                return TEXT_ERROR
             }
 
             val result = stream.bufferedReader().use { it.readText() }
@@ -204,7 +226,7 @@ class DiagnosisViewModel: ViewModel(){
             return message.getString("content")
         } catch (e: Exception) {
             println(e)
-            return "問題が発生しました。再度お試しください。(${e.message})"
+            return "$TEXT_ERROR(${e.message})"
         }
     }
 }

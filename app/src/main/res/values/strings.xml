@@ -4,6 +4,12 @@
     <string name="start_diagnosis">診断をはじめる</string>
     <string name="diagnosis">診断</string>
     <string name="first_message">こんにちは！何かお困りですか？</string>
-
-
+    <string name="diagnosis_description">気持ちの健康を数値化します</string>
+    <string name="thinking_question">質問を考えています...</string>
+    <string name="result">結果</string>
+    <string name="scoring">計算中...</string>
+    <string name="failed_fetch">取得に失敗しました</string>
+    <string name="score">スコア</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
 </resources>
