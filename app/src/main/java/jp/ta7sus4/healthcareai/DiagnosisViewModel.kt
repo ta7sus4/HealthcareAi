@@ -18,7 +18,7 @@ class DiagnosisViewModel: ViewModel(){
         private const val TRY_MAX_COUNT = 5
         private const val TEXT_LOADING = "読み込み中..."
         private const val TEXT_REQUEST_QUESTION = "今の気持ちの健康を数値化するはい/いいえで答えられる質問を9個考えて"
-        private const val TEXT_REQUEST_SCORE = "以下のユーザに対する評価の文からスコアを0-9999の範囲で点数をつけて推測して必ず「XXXX」のように表して:"
+        private const val TEXT_REQUEST_SCORE = "以下のユーザに対する評価の文からスコアを0-9999の範囲で一の位まで点数をつけて推測して必ず「XXXX」のように表して:"
         private const val TEXT_REQUEST_ADVICE = "100文字以内でアドバイスして"
         private const val TEXT_ERROR = "問題が発生しました。再度お試しください"
     }

@@ -78,7 +78,7 @@ fun DiagnosisScreen(
                 onClick = { viewModel.onClickYes() },
             ) {
                 Text(
-                    text = " ${stringResource(id = R.string.no)} ",
+                    text = " ${stringResource(id = R.string.yes)} ",
                     color = Color.Black,
                     fontSize = 18.sp,
                 )
