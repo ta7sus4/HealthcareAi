@@ -29,7 +29,7 @@ fun MainScreen(
     ) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "アプリ名",
+            text = stringResource(R.string.app_name),
             fontSize = 30.sp,
         )
         Spacer(modifier = Modifier.weight(1f))
