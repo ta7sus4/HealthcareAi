@@ -1,4 +1,4 @@
-package jp.ta7sus4.healthcareai
+package jp.ta7sus4.healthcareai.diagnosis
 
 import android.os.StrictMode
 import android.util.Log
@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import jp.ta7sus4.healthcareai.BuildConfig
+import jp.ta7sus4.healthcareai.chat.ChatMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

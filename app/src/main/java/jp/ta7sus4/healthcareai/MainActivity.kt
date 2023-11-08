@@ -22,6 +22,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import jp.ta7sus4.healthcareai.chat.ChatScreen
+import jp.ta7sus4.healthcareai.chat.ChatViewModel
+import jp.ta7sus4.healthcareai.diagnosis.DiagnosisStartScreen
+import jp.ta7sus4.healthcareai.diagnosis.DiagnosisViewModel
 import jp.ta7sus4.healthcareai.ui.theme.HealthcareAiTheme
 
 class MainActivity : ComponentActivity() {
