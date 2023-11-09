@@ -1,4 +1,4 @@
-package jp.ta7sus4.healthcareai
+package jp.ta7sus4.healthcareai.diagnosis
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ta7sus4.healthcareai.R
 
 @Composable
 fun DiagnosisResultScreen(

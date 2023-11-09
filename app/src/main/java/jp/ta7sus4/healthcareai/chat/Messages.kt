@@ -1,4 +1,4 @@
-package jp.ta7sus4.healthcareai
+package jp.ta7sus4.healthcareai.chat
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
