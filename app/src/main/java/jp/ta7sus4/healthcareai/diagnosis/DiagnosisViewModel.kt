@@ -62,6 +62,10 @@ class DiagnosisViewModel: ViewModel(){
         }
     }
 
+    fun historyButtonPressed() {
+        // TODO: 表示
+    }
+
     fun endButtonPressed() {
         endDiagnosis()
     }

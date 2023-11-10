@@ -2,6 +2,7 @@
     <string name="app_name">repAIr</string>
     <string name="start_chat">チャットをはじめる</string>
     <string name="start_diagnosis">診断をはじめる</string>
+    <string name="show_history">履歴を見る</string>
     <string name="diagnosis">診断</string>
     <string name="first_message">こんにちは！何かお困りですか？</string>
     <string name="diagnosis_description">気持ちの健康を数値化します</string>
