@@ -18,38 +18,42 @@ fun DiagnosisStartScreen(
     viewModel: DiagnosisViewModel,
     modifier: Modifier = Modifier,
 ) {
-    if (viewModel.isResult){
-        DiagnosisResultScreen(viewModel = viewModel)
-    } else if (viewModel.isStart) {
-        DiagnosisScreen(viewModel = viewModel)
-    } else {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.fillMaxSize(),
-        ) {
-            Spacer(Modifier.weight(0.85f))
-            Text(
-                text = stringResource(id = R.string.diagnosis),
-                fontSize = 30.sp,
-            )
-            Spacer(Modifier.weight(0.2f))
-            Text(text = stringResource(id = R.string.diagnosis_description))
-            Spacer(Modifier.weight(0.8f))
-            OutlinedButton(onClick = { viewModel.startButtonPressed() }) {
-                Text(
-                    text = if (viewModel.isLoading) stringResource(id = R.string.thinking_question) else stringResource(id = R.string.start_diagnosis)
-                )
-            }
-            Spacer(Modifier.weight(0.2f))
-            OutlinedButton(
-                onClick = { viewModel.historyButtonPressed() },
-                enabled = !viewModel.isLoading
+    when (viewModel.diagnosisState) {
+        DiagnosisState.RESULT -> {
+            DiagnosisResultScreen(viewModel = viewModel)
+        }
+        DiagnosisState.STARTED -> {
+            DiagnosisScreen(viewModel = viewModel)
+        }
+        else -> {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier.fillMaxSize(),
             ) {
+                Spacer(Modifier.weight(0.85f))
                 Text(
-                    text = stringResource(id = R.string.show_history)
+                    text = stringResource(id = R.string.diagnosis),
+                    fontSize = 30.sp,
                 )
+                Spacer(Modifier.weight(0.2f))
+                Text(text = stringResource(id = R.string.diagnosis_description))
+                Spacer(Modifier.weight(0.8f))
+                OutlinedButton(onClick = { viewModel.startButtonPressed() }) {
+                    Text(
+                        text = if (viewModel.diagnosisState == DiagnosisState.LOADING) stringResource(id = R.string.thinking_question) else stringResource(id = R.string.start_diagnosis)
+                    )
+                }
+                Spacer(Modifier.weight(0.2f))
+                OutlinedButton(
+                    onClick = { viewModel.historyButtonPressed() },
+                    enabled = viewModel.diagnosisState != DiagnosisState.LOADING
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.show_history)
+                    )
+                }
+                Spacer(Modifier.weight(1f))
             }
-            Spacer(Modifier.weight(1f))
         }
     }
 }

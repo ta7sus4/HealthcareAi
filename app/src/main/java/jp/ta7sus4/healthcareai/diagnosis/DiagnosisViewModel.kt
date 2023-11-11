@@ -15,6 +15,13 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
+enum class DiagnosisState {
+    INIT,
+    LOADING,
+    STARTED,
+    RESULT,
+}
+
 class DiagnosisViewModel: ViewModel(){
     companion object {
         private const val TRY_MAX_COUNT = 5
@@ -27,14 +34,8 @@ class DiagnosisViewModel: ViewModel(){
 
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
 
-    private val _isStart = mutableStateOf(false)
-    val isStart: Boolean by _isStart
-
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: Boolean by _isLoading
-
-    private val _isResult = mutableStateOf(false)
-    val isResult: Boolean by _isResult
+    private var _diagnosisState = mutableStateOf(DiagnosisState.INIT)
+    val diagnosisState: DiagnosisState by _diagnosisState
 
     private var questions = mutableListOf<Question>()
     private var count by mutableStateOf(0)
@@ -49,14 +50,13 @@ class DiagnosisViewModel: ViewModel(){
     private var aiResponse = ""
 
     fun startButtonPressed() {
-        if (_isLoading.value) { return }
+        if (diagnosisState == DiagnosisState.LOADING) { return }
         viewModelScope.launch {
-            _isLoading.value = true
+            _diagnosisState.value = DiagnosisState.LOADING
             questions = mutableListOf()
             createQuestion()
             count = 0
-            _isStart.value = true
-            _isLoading.value = false
+            _diagnosisState.value = DiagnosisState.STARTED
             _resultMessage.value = TEXT_LOADING
             _resultScore.value = -1
         }
@@ -86,13 +86,13 @@ class DiagnosisViewModel: ViewModel(){
     }
 
     fun currentQuestion(): String {
-        if (_isResult.value) return TEXT_LOADING
+        if (diagnosisState == DiagnosisState.RESULT) return TEXT_LOADING
         if (questions.size <= count) { showResult() }
         return questions.getOrNull(count)?.question ?: TEXT_LOADING
     }
 
     private fun showResult() {
-        _isResult.value = true
+        _diagnosisState.value = DiagnosisState.RESULT
         resultString()
     }
 
@@ -144,9 +144,10 @@ class DiagnosisViewModel: ViewModel(){
     }
 
     private fun endDiagnosis() {
-        _isStart.value = false
-        _isResult.value = false
+        _diagnosisState.value = DiagnosisState.INIT
         count = 0
+        _resultMessage.value = TEXT_LOADING
+        _resultScore.value = -1
     }
 
     private fun createQuestion() {
