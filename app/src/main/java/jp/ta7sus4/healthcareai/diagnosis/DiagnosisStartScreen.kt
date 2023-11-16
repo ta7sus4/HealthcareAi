@@ -25,6 +25,9 @@ fun DiagnosisStartScreen(
         DiagnosisState.STARTED -> {
             DiagnosisScreen(viewModel = viewModel)
         }
+        DiagnosisState.HISTORY -> {
+            DiagnosisHistoryScreen(viewModel = viewModel)
+        }
         else -> {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
