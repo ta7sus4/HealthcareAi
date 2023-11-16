@@ -109,7 +109,7 @@ class DiagnosisViewModel: ViewModel(){
         resultString()
     }
 
-    private fun resultScore() {
+    private fun resultScore(message: String) {
         val scores = mutableListOf(-1, -1, -1)
         for (i in 0..2) {
             viewModelScope.launch {
@@ -118,7 +118,7 @@ class DiagnosisViewModel: ViewModel(){
                     scores[i] = makeHttpRequest(
                         listOf(
                             ChatMessage(
-                                text = TEXT_REQUEST_SCORE + _resultMessage.value,
+                                text = TEXT_REQUEST_SCORE + message,
                                 isMe = true
                             ),
                         )
@@ -133,7 +133,7 @@ class DiagnosisViewModel: ViewModel(){
                 if (scores.all { it >= 0 }) {
                     val averageScore = scores.average().toInt()
                     _resultScore.value = averageScore
-                    postHistory(averageScore, resultMessage)
+                    postHistory(averageScore, message)
                 }
             }
         }
@@ -156,7 +156,7 @@ class DiagnosisViewModel: ViewModel(){
                 tryCount--
                 if (tryCount <= 0) break
             }
-            resultScore()
+            resultScore(_resultMessage.value)
         }
     }
 
