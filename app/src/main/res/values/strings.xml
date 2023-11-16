@@ -13,4 +13,8 @@
     <string name="score">スコア</string>
     <string name="yes">はい</string>
     <string name="no">いいえ</string>
+    <string name="history">履歴</string>
+    <string name="no_history">履歴はありません</string>
+    <string name="delete_all">すべて消去</string>
+
 </resources>
