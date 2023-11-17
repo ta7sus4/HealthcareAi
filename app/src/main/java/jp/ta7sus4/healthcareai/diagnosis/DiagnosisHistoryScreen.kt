@@ -29,6 +29,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.ta7sus4.healthcareai.R
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+object DateFormats {
+    val historyFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ROOT)
+}
 
 @Composable
 fun DiagnosisHistoryScreen(
@@ -117,7 +123,7 @@ fun DiagnosisHistoryCard(history: DiagnosisEntity) {
                 .padding(8.dp)
         ){
             Text(
-                text = history.date.toString(),
+                text = DateFormats.historyFormat.format(history.date),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -128,7 +134,7 @@ fun DiagnosisHistoryCard(history: DiagnosisEntity) {
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(start = 4.dp)
+                    .padding(start = 4.dp, bottom = 2.dp)
             )
             Text(
                 text = history.comment,
