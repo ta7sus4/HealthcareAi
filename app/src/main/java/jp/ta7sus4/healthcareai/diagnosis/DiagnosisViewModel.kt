@@ -3,6 +3,7 @@ package jp.ta7sus4.healthcareai.diagnosis
 import android.os.StrictMode
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -11,9 +12,18 @@ import jp.ta7sus4.healthcareai.chat.ChatMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+
+enum class DiagnosisState {
+    INIT,
+    LOADING,
+    STARTED,
+    RESULT,
+    HISTORY,
+}
 
 class DiagnosisViewModel: ViewModel(){
     companion object {
@@ -25,16 +35,13 @@ class DiagnosisViewModel: ViewModel(){
         private const val TEXT_ERROR = "問題が発生しました。再度お試しください"
     }
 
+    private val dao = RoomApplication.database.diagnosisDao()
+    var historyList = mutableStateListOf<DiagnosisEntity>()
+
     private val viewModelScope = CoroutineScope(Dispatchers.IO)
 
-    private val _isStart = mutableStateOf(false)
-    val isStart: Boolean by _isStart
-
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: Boolean by _isLoading
-
-    private val _isResult = mutableStateOf(false)
-    val isResult: Boolean by _isResult
+    private var _diagnosisState = mutableStateOf(DiagnosisState.INIT)
+    val diagnosisState: DiagnosisState by _diagnosisState
 
     private var questions = mutableListOf<Question>()
     private var count by mutableStateOf(0)
@@ -49,16 +56,26 @@ class DiagnosisViewModel: ViewModel(){
     private var aiResponse = ""
 
     fun startButtonPressed() {
-        if (_isLoading.value) { return }
+        if (diagnosisState == DiagnosisState.LOADING) { return }
         viewModelScope.launch {
-            _isLoading.value = true
+            _diagnosisState.value = DiagnosisState.LOADING
             questions = mutableListOf()
             createQuestion()
             count = 0
-            _isStart.value = true
-            _isLoading.value = false
+            _diagnosisState.value = DiagnosisState.STARTED
             _resultMessage.value = TEXT_LOADING
             _resultScore.value = -1
+        }
+    }
+
+    fun historyButtonPressed() {
+        if (historyList.isEmpty()) viewModelScope.launch { loadHistory() }
+        _diagnosisState.value = DiagnosisState.HISTORY
+    }
+
+    fun historyDeleteButtonPressed() {
+        viewModelScope.launch {
+            deleteAllHistory()
         }
     }
 
@@ -82,18 +99,18 @@ class DiagnosisViewModel: ViewModel(){
     }
 
     fun currentQuestion(): String {
-        if (_isResult.value) return TEXT_LOADING
+        if (diagnosisState == DiagnosisState.RESULT) return TEXT_LOADING
         if (questions.size <= count) { showResult() }
         return questions.getOrNull(count)?.question ?: TEXT_LOADING
     }
 
     private fun showResult() {
-        _isResult.value = true
+        _diagnosisState.value = DiagnosisState.RESULT
         resultString()
     }
 
-    private fun resultScore() {
-        val scores = mutableListOf<Int>(-1, -1, -1)
+    private fun resultScore(message: String) {
+        val scores = mutableListOf(-1, -1, -1)
         for (i in 0..2) {
             viewModelScope.launch {
                 var tryCount = TRY_MAX_COUNT
@@ -101,7 +118,7 @@ class DiagnosisViewModel: ViewModel(){
                     scores[i] = makeHttpRequest(
                         listOf(
                             ChatMessage(
-                                text = TEXT_REQUEST_SCORE + _resultMessage.value,
+                                text = TEXT_REQUEST_SCORE + message,
                                 isMe = true
                             ),
                         )
@@ -112,8 +129,12 @@ class DiagnosisViewModel: ViewModel(){
                         break
                     }
                 }
-                if (scores[i] >= 10000) scores[i] /= 10000
-                if (scores.all { it >= 0 }) _resultScore.value = scores.average().toInt()
+                if (scores[i] >= 10000) scores[i] %= 10000
+                if (scores.all { it >= 0 }) {
+                    val averageScore = scores.average().toInt()
+                    _resultScore.value = averageScore
+                    postHistory(averageScore, message)
+                }
             }
         }
     }
@@ -135,14 +156,15 @@ class DiagnosisViewModel: ViewModel(){
                 tryCount--
                 if (tryCount <= 0) break
             }
-            resultScore()
+            resultScore(_resultMessage.value)
         }
     }
 
     private fun endDiagnosis() {
-        _isStart.value = false
-        _isResult.value = false
+        _diagnosisState.value = DiagnosisState.INIT
         count = 0
+        _resultMessage.value = TEXT_LOADING
+        _resultScore.value = -1
     }
 
     private fun createQuestion() {
@@ -229,6 +251,38 @@ class DiagnosisViewModel: ViewModel(){
         } catch (e: Exception) {
             println(e)
             return "$TEXT_ERROR(${e.message})"
+        }
+    }
+
+    private suspend fun loadHistory() {
+        withContext(Dispatchers.Default) {
+            dao.getAll().forEach { history ->
+                historyList.add(history)
+            }
+        }
+    }
+
+    private suspend fun postHistory(score: Int, comment: String) {
+        withContext(Dispatchers.Default) {
+            dao.post(DiagnosisEntity(score = score, comment = comment))
+            historyList.clear()
+            loadHistory()
+        }
+    }
+
+    private suspend fun deleteHistory(diagnosis: DiagnosisEntity) {
+        withContext(Dispatchers.Default) {
+            dao.delete(diagnosis)
+            historyList.clear()
+            loadHistory()
+        }
+    }
+
+    private suspend fun deleteAllHistory() {
+        withContext(Dispatchers.Default) {
+            dao.deleteAll()
+            historyList.clear()
+            loadHistory()
         }
     }
 }
