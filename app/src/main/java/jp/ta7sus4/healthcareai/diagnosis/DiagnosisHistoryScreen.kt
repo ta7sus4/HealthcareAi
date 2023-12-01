@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -74,7 +75,7 @@ fun DiagnosisHistoryScreen(
                 text = stringResource(id = R.string.delete_all),
                 textAlign = TextAlign.Right,
                 modifier = Modifier
-                    .clickable(onClick = { viewModel.historyDeleteButtonPressed() })
+                    .clickable(onClick = { viewModel.historyDeleteAllButtonPressed() })
             )
         }
         if (viewModel.historyList.size == 0 ) {
@@ -101,7 +102,7 @@ fun DiagnosisHistoryScreen(
             LazyColumn {
                 items(viewModel.historyList) { history ->
                     key(history.id) {
-                        DiagnosisHistoryCard(history = history)
+                        DiagnosisHistoryCard(viewModel = viewModel, history = history)
                     }
                 }
             }
@@ -110,7 +111,10 @@ fun DiagnosisHistoryScreen(
 }
 
 @Composable
-fun DiagnosisHistoryCard(history: DiagnosisEntity) {
+fun DiagnosisHistoryCard(
+    viewModel: DiagnosisViewModel,
+    history: DiagnosisEntity,
+) {
     Card(
         modifier = Modifier
             .padding(
@@ -122,20 +126,28 @@ fun DiagnosisHistoryCard(history: DiagnosisEntity) {
             modifier = Modifier
                 .padding(8.dp)
         ){
-            Text(
-                text = DateFormats.historyFormat.format(history.date),
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(2.dp)
-            )
-            Text(
-                text = "スコア: ${history.score}",
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(start = 4.dp, bottom = 2.dp)
-            )
+            Row {
+                Column {
+                    Text(
+                        text = DateFormats.historyFormat.format(history.date),
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(2.dp)
+                    )
+                    Text(
+                        text = "スコア: ${history.score}",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(start = 4.dp, bottom = 2.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { viewModel.historyDeleteButtonPressed(history) }) {
+                    Icon(Icons.Outlined.Delete, contentDescription = null)
+                }
+            }
             Text(
                 text = history.comment,
                 fontSize = 14.sp,

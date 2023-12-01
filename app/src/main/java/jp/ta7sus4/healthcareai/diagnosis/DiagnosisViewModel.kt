@@ -73,7 +73,13 @@ class DiagnosisViewModel: ViewModel(){
         _diagnosisState.value = DiagnosisState.HISTORY
     }
 
-    fun historyDeleteButtonPressed() {
+    fun historyDeleteButtonPressed(diagnosis: DiagnosisEntity) {
+        viewModelScope.launch {
+            deleteHistory(diagnosis)
+        }
+    }
+
+    fun historyDeleteAllButtonPressed() {
         viewModelScope.launch {
             deleteAllHistory()
         }
