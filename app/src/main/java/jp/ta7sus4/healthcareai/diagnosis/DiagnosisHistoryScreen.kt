@@ -140,7 +140,7 @@ fun DiagnosisHistoryScreen(
                 Text("履歴", modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp))
             }
             LazyColumn {
-                items(viewModel.historyList) { history ->
+                items(viewModel.historyList.reversed()) { history ->
                     key(history.id) {
                         DiagnosisHistoryCard(viewModel = viewModel, history = history)
                     }
