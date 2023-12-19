@@ -22,12 +22,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.ta7sus4.healthcareai.R
+import jp.ta7sus4.healthcareai.ui.theme.LightGreen
+import jp.ta7sus4.healthcareai.ui.theme.WhiteOpacity50
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,8 +45,7 @@ fun ChatScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(4.dp)
-                .fillMaxWidth()
-                .background(Color.White),
+                .fillMaxWidth(),
         ) {
             var input by rememberSaveable { mutableStateOf("") }
             val firstMessage = stringResource(id = R.string.first_message)
@@ -61,6 +61,7 @@ fun ChatScreen(
                 Icon(
                     contentDescription = null,
                     painter = rememberVectorPainter(image = Icons.Default.Refresh),
+                    tint = LightGreen,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -70,7 +71,8 @@ fun ChatScreen(
                     input = newText.trimStart { it == '0' }
                 },
                 modifier = Modifier
-                    .weight(1f),
+                    .weight(1f)
+                    .background(WhiteOpacity50),
             )
             IconButton(
                 onClick = {
@@ -88,6 +90,7 @@ fun ChatScreen(
                 Icon(
                     contentDescription = null,
                     painter = rememberVectorPainter(image = Icons.Default.Send),
+                    tint = LightGreen,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -95,7 +98,7 @@ fun ChatScreen(
     }
 }
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Preview(showBackground = false, widthDp = 360, heightDp = 640)
 @Composable
 fun ChatPrev() {
     ChatScreen(ChatViewModel())

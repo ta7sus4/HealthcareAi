@@ -12,11 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ta7sus4.healthcareai.ui.theme.WhiteOpacity50
 
 @Composable
 fun Message(
@@ -40,7 +40,7 @@ fun Message(
         Row(
             modifier = Modifier
                 .background(
-                    color = if (message.isMe) Color(0xFFE5ECDD) else Color(0xFFC8F099),
+                    color = WhiteOpacity50,
                     shape = MaterialTheme.shapes.medium,
                 )
         ) {
@@ -49,13 +49,12 @@ fun Message(
                 fontSize = 18.sp,
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 2.dp),
-                color = if (message.isMe) MaterialTheme.colorScheme.primary else Color(0x99283C28),
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MessagePrev() {
     Message(message = ChatMessage(text = "こんにちは", isMe = false))

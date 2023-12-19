@@ -12,12 +12,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.ta7sus4.healthcareai.R
+import jp.ta7sus4.healthcareai.common.HealthyButton
 
 @Composable
 fun DiagnosisScreen(
@@ -33,7 +32,8 @@ fun DiagnosisScreen(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
     ) {
         IconButton(
             onClick = {
@@ -65,25 +65,9 @@ fun DiagnosisScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Spacer(Modifier.weight(1f))
-            OutlinedButton(
-                onClick = { viewModel.onClickNo() },
-            ) {
-                Text(
-                    text = stringResource(id = R.string.no),
-                    color = Color.Black,
-                    fontSize = 18.sp,
-                )
-            }
+            HealthyButton(text = stringResource(id = R.string.no), onClick = { viewModel.onClickNo() })
             Spacer(Modifier.weight(1f))
-            OutlinedButton(
-                onClick = { viewModel.onClickYes() },
-            ) {
-                Text(
-                    text = " ${stringResource(id = R.string.yes)} ",
-                    color = Color.Black,
-                    fontSize = 18.sp,
-                )
-            }
+            HealthyButton(text = " ${stringResource(id = R.string.yes)} ", onClick = { viewModel.onClickYes() })
             Spacer(Modifier.weight(1f))
         }
         Spacer(modifier = Modifier.weight(0.5f))
