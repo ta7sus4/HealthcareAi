@@ -18,15 +18,16 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.ta7sus4.healthcareai.R
+import jp.ta7sus4.healthcareai.ui.theme.WhiteOpacity50
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -51,6 +53,7 @@ fun LineGraph(
     ) {
         Text("${data.maxOrNull() ?: 0f}", fontSize = 10.sp, modifier = Modifier.align(Alignment.TopStart))
         Text("${data.minOrNull() ?: 0f}", fontSize = 10.sp, modifier = Modifier.align(Alignment.BottomStart))
+        val onBackgroundColor = MaterialTheme.colorScheme.onBackground
         Canvas(modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
@@ -68,7 +71,7 @@ fun LineGraph(
                 drawLine(
                     start = Offset(x1, y1),
                     end = Offset(x2, y2),
-                    color = Color.Gray,
+                    color = onBackgroundColor,
                     strokeWidth = 5f
                 )
             }
@@ -130,6 +133,9 @@ fun DiagnosisHistoryScreen(
                 Text("スコアの推移", modifier = Modifier.padding(horizontal = 10.dp))
                 if (viewModel.historyList.size >= 2) {
                     Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = WhiteOpacity50,
+                        ),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         LineGraph(data = viewModel.historyList.map { it.score })
@@ -156,6 +162,9 @@ fun DiagnosisHistoryCard(
     history: DiagnosisEntity,
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = WhiteOpacity50,
+        ),
         modifier = Modifier
             .padding(
                 horizontal = 12.dp,
@@ -209,7 +218,6 @@ fun HistoryInformation(
     ) {
         Icon(
             Icons.Outlined.Info,
-            tint = Color.Gray,
             contentDescription = null,
             modifier = Modifier
                 .padding(top = 2.dp, end = 4.dp)
@@ -218,7 +226,6 @@ fun HistoryInformation(
         Text(
             text = stringResource(id = textResource),
             fontSize = 18.sp,
-            color = Color.Gray,
         )
     }
 }

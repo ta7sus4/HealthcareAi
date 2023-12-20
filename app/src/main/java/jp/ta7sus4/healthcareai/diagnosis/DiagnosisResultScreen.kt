@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +51,7 @@ fun DiagnosisResultScreen(
             text = stringResource(id = R.string.result),
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
+            style = TextStyle(textDecoration = TextDecoration.Underline),
             modifier = Modifier
                 .padding(30.dp)
                 .weight(1f),
@@ -76,7 +79,7 @@ fun DiagnosisResultScreen(
                 .defaultMinSize(minHeight = 150.dp)
                 .padding(horizontal = 20.dp)
         )
-        Spacer(modifier = Modifier.weight(0.3f))
+        Spacer(modifier = Modifier.weight(0.2f))
     }
 }
 

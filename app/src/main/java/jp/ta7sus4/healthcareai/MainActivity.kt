@@ -3,6 +3,7 @@ package jp.ta7sus4.healthcareai
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +29,8 @@ import jp.ta7sus4.healthcareai.chat.ChatViewModel
 import jp.ta7sus4.healthcareai.diagnosis.DiagnosisStartScreen
 import jp.ta7sus4.healthcareai.diagnosis.DiagnosisViewModel
 import jp.ta7sus4.healthcareai.ui.theme.HealthcareAiTheme
+import jp.ta7sus4.healthcareai.ui.theme.HealthyBlue
+import jp.ta7sus4.healthcareai.ui.theme.HealthyGreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +60,11 @@ fun MainNavigator() {
         NavHost(
             navController = navController,
             startDestination = "main",
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding).background(
+                brush = Brush.linearGradient(
+                    colors = listOf(HealthyGreen, HealthyBlue)
+                )
+            ),
         ) {
             composable("main") {
                 MainScreen(
@@ -73,9 +81,8 @@ fun MainNavigator() {
 fun BottomBar(
     navHostController: NavHostController
 ) {
-
     BottomNavigation(
-        backgroundColor = MaterialTheme.colorScheme.surface,
+        backgroundColor = HealthyBlue
     ) {
         BottomNavigationItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = null) },
