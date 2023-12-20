@@ -11,8 +11,13 @@ AIを使ってユーザの健康を手助けするアプリ
 
 |対話機能|健康度の数値化|
 |--|--|
-| <img src="https://github.com/ta7sus4/HealthcareAi/assets/85665552/da1111fd-d6a4-472f-9d27-f81c41f799f2" width=350> | <img src="https://github.com/ta7sus4/HealthcareAi/assets/85665552/46c3d893-0ecd-478d-adbb-305c6879faba" width=350> |
+| <img src="https://github.com/ta7sus4/HealthcareAi/assets/85665552/1fdb4596-e1f7-48b6-9cd3-91ca7984aac8" width=350> | <img src="https://github.com/ta7sus4/HealthcareAi/assets/85665552/2cea398a-21fd-4b29-aaf2-4127c3b7642b" width=350> |
 
+## 使用技術
+- Kotlin
+- Jetpack Compose
+- Kotlin Coroutines
+- Jetpack Room
 
 ## 環境構築
 APIキーの追加
