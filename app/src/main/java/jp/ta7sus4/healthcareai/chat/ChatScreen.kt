@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.ta7sus4.healthcareai.R
-import jp.ta7sus4.healthcareai.ui.theme.LightGreen
 import jp.ta7sus4.healthcareai.ui.theme.WhiteOpacity50
 import kotlinx.coroutines.launch
 
@@ -61,7 +61,7 @@ fun ChatScreen(
                 Icon(
                     contentDescription = null,
                     painter = rememberVectorPainter(image = Icons.Default.Refresh),
-                    tint = LightGreen,
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -90,7 +90,7 @@ fun ChatScreen(
                 Icon(
                     contentDescription = null,
                     painter = rememberVectorPainter(image = Icons.Default.Send),
-                    tint = LightGreen,
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

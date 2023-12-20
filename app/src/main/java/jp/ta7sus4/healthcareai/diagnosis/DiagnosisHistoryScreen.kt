@@ -21,13 +21,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -53,6 +53,7 @@ fun LineGraph(
     ) {
         Text("${data.maxOrNull() ?: 0f}", fontSize = 10.sp, modifier = Modifier.align(Alignment.TopStart))
         Text("${data.minOrNull() ?: 0f}", fontSize = 10.sp, modifier = Modifier.align(Alignment.BottomStart))
+        val onBackgroundColor = MaterialTheme.colorScheme.onBackground
         Canvas(modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
@@ -70,7 +71,7 @@ fun LineGraph(
                 drawLine(
                     start = Offset(x1, y1),
                     end = Offset(x2, y2),
-                    color = Color.White,
+                    color = onBackgroundColor,
                     strokeWidth = 5f
                 )
             }

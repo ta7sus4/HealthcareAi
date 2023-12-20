@@ -8,3 +8,5 @@ val HealthyGreen = Color(68,250,128)
 val HealthyBlue = Color(78,137,184)
 
 val LightGreen = Color(0xFFEBFFEB)
+
+val DarkGray = Color(0xFF444444)

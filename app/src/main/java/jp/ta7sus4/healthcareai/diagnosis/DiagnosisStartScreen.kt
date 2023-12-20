@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -41,10 +40,9 @@ fun DiagnosisStartScreen(
                     text = stringResource(id = R.string.diagnosis),
                     fontSize = 30.sp,
                     style = TextStyle(textDecoration = TextDecoration.Underline),
-                    color = Color.White,
                 )
                 Spacer(Modifier.weight(0.2f))
-                Text(text = stringResource(id = R.string.diagnosis_description), color = Color.White)
+                Text(text = stringResource(id = R.string.diagnosis_description))
                 Spacer(Modifier.weight(0.8f))
                 HealthyButton(
                     text = if (viewModel.diagnosisState == DiagnosisState.LOADING) stringResource(id = R.string.thinking_question) else stringResource(id = R.string.start_diagnosis),
