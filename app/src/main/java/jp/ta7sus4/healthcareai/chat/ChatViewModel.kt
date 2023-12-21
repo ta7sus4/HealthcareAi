@@ -4,9 +4,8 @@ import android.os.StrictMode
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.ta7sus4.healthcareai.BuildConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -20,7 +19,6 @@ class ChatViewModel: ViewModel() {
         private const val TEXT_THINKING = "考えています..."
     }
 
-    private val viewModelScope = CoroutineScope(Dispatchers.IO)
     var messages = mutableStateOf(listOf(ChatMessage(text = TEXT_FIRST_MESSAGE, isMe = false)))
 
     private fun addMessage(message: ChatMessage) {

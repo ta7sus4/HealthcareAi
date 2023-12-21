@@ -7,9 +7,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.ta7sus4.healthcareai.BuildConfig
 import jp.ta7sus4.healthcareai.chat.ChatMessage
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,8 +37,6 @@ class DiagnosisViewModel: ViewModel(){
 
     private val dao = RoomApplication.database.diagnosisDao()
     var historyList = mutableStateListOf<DiagnosisEntity>()
-
-    private val viewModelScope = CoroutineScope(Dispatchers.IO)
 
     private var _diagnosisState = mutableStateOf(DiagnosisState.INIT)
     val diagnosisState: DiagnosisState by _diagnosisState
