@@ -6,7 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.ta7sus4.healthcareai.BuildConfig
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -29,11 +31,21 @@ class ChatViewModel: ViewModel() {
         messages.value = messages.value.dropLast(1)
     }
 
-    fun sendMessage(message: ChatMessage) {
+    fun sendButtonPressed(query: String){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sendMessage(ChatMessage(text = query, isMe = true))
+            }
+        }
+    }
+
+    private fun sendMessage(message: ChatMessage) {
         addMessage(message)
         addMessage(ChatMessage(text = TEXT_THINKING, isMe = false))
         viewModelScope.launch {
-            makeHttpRequest()
+            withContext(Dispatchers.IO) {
+                makeHttpRequest()
+            }
         }
     }
 

@@ -18,7 +18,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.ta7sus4.healthcareai.R
 import jp.ta7sus4.healthcareai.ui.theme.WhiteOpacity50
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,8 +35,6 @@ fun ChatScreen(
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     Box(modifier = modifier) {
         Messages(viewModel = viewModel)
         Row(
@@ -79,9 +75,7 @@ fun ChatScreen(
                     if (input == "") return@IconButton
                     val query = input
                     input = ""
-                    coroutineScope.launch {
-                        viewModel.sendMessage(ChatMessage(text = query, isMe = true))
-                    }
+                    viewModel.sendButtonPressed(query)
                 },
                 modifier = Modifier
                     .padding(12.dp)

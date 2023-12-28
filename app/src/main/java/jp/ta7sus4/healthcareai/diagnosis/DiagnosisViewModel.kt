@@ -56,9 +56,11 @@ class DiagnosisViewModel: ViewModel(){
     fun startButtonPressed() {
         if (diagnosisState == DiagnosisState.LOADING) { return }
         viewModelScope.launch {
-            _diagnosisState.value = DiagnosisState.LOADING
-            questions = mutableListOf()
-            createQuestion()
+                _diagnosisState.value = DiagnosisState.LOADING
+            withContext(Dispatchers.IO) {
+                questions = mutableListOf()
+                createQuestion()
+            }
             count = 0
             _diagnosisState.value = DiagnosisState.STARTED
             _resultMessage.value = TEXT_LOADING
@@ -67,19 +69,23 @@ class DiagnosisViewModel: ViewModel(){
     }
 
     fun historyButtonPressed() {
-        if (historyList.isEmpty()) viewModelScope.launch { loadHistory() }
+        if (historyList.isEmpty()) viewModelScope.launch { withContext(Dispatchers.IO) { loadHistory() } }
         _diagnosisState.value = DiagnosisState.HISTORY
     }
 
     fun historyDeleteButtonPressed(diagnosis: DiagnosisEntity) {
         viewModelScope.launch {
-            deleteHistory(diagnosis)
+            withContext(Dispatchers.IO) {
+                deleteHistory(diagnosis)
+            }
         }
     }
 
     fun historyDeleteAllButtonPressed() {
         viewModelScope.launch {
-            deleteAllHistory()
+            withContext(Dispatchers.IO) {
+                deleteAllHistory()
+            }
         }
     }
 
@@ -117,27 +123,29 @@ class DiagnosisViewModel: ViewModel(){
         val scores = mutableListOf(-1, -1, -1)
         for (i in 0..2) {
             viewModelScope.launch {
-                var tryCount = TRY_MAX_COUNT
-                while (scores[i] < 0) {
-                    scores[i] = makeHttpRequest(
-                        listOf(
-                            ChatMessage(
-                                text = TEXT_REQUEST_SCORE + message,
-                                isMe = true
-                            ),
-                        )
-                    ).filter { it.isDigit() }.toIntOrNull() ?: -2
-                    tryCount--
-                    if (tryCount <= 0){
-                        scores[i] = 5000
-                        break
+                withContext(Dispatchers.IO) {
+                    var tryCount = TRY_MAX_COUNT
+                    while (scores[i] < 0) {
+                        scores[i] = makeHttpRequest(
+                            listOf(
+                                ChatMessage(
+                                    text = TEXT_REQUEST_SCORE + message,
+                                    isMe = true
+                                ),
+                            )
+                        ).filter { it.isDigit() }.toIntOrNull() ?: -2
+                        tryCount--
+                        if (tryCount <= 0) {
+                            scores[i] = 5000
+                            break
+                        }
                     }
-                }
-                if (scores[i] >= 10000) scores[i] %= 10000
-                if (scores.all { it >= 0 }) {
-                    val averageScore = scores.average().toInt()
-                    _resultScore.value = averageScore
-                    postHistory(averageScore, message)
+                    if (scores[i] >= 10000) scores[i] %= 10000
+                    if (scores.all { it >= 0 }) {
+                        val averageScore = scores.average().toInt()
+                        _resultScore.value = averageScore
+                        postHistory(averageScore, message)
+                    }
                 }
             }
         }
@@ -148,19 +156,21 @@ class DiagnosisViewModel: ViewModel(){
             "${index + 1}: Q:${it.question} A:${if (it.answer == true) "はい" else "いいえ"}\n"
         }
         viewModelScope.launch {
-            var tryCount = TRY_MAX_COUNT
-            while (_resultMessage.value.length !in 21..400) {
-                _resultMessage.value = makeHttpRequest(
-                    listOf(
-                        ChatMessage(text = TEXT_REQUEST_QUESTION, isMe = true),
-                        ChatMessage(text = aiResponse, isMe = false),
-                        ChatMessage(text = "$TEXT_REQUEST_ADVICE:$query\n", isMe = true),
+            withContext(Dispatchers.IO) {
+                var tryCount = TRY_MAX_COUNT
+                while (_resultMessage.value.length !in 21..400) {
+                    _resultMessage.value = makeHttpRequest(
+                        listOf(
+                            ChatMessage(text = TEXT_REQUEST_QUESTION, isMe = true),
+                            ChatMessage(text = aiResponse, isMe = false),
+                            ChatMessage(text = "$TEXT_REQUEST_ADVICE:$query\n", isMe = true),
+                        )
                     )
-                )
-                tryCount--
-                if (tryCount <= 0) break
+                    tryCount--
+                    if (tryCount <= 0) break
+                }
+                resultScore(_resultMessage.value)
             }
-            resultScore(_resultMessage.value)
         }
     }
 
