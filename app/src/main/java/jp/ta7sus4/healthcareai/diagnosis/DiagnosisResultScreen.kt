@@ -72,7 +72,7 @@ fun DiagnosisResultScreen(
         Spacer(modifier = Modifier.weight(0.2f))
 
         Text(
-            text = viewModel.resultMessage,
+            text = viewModel.resultMessage.ifEmpty { stringResource(id = R.string.loading) },
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier

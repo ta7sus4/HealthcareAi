@@ -2,6 +2,7 @@ package jp.ta7sus4.healthcareai.diagnosis
 
 import android.os.StrictMode
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,60 +18,56 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-enum class DiagnosisState {
-    INIT,
-    LOADING,
-    STARTED,
-    RESULT,
-    HISTORY,
+sealed class DiagnosisState {
+    object Init : DiagnosisState()
+    object Loading : DiagnosisState()
+    object Started : DiagnosisState()
+
+    object Result : DiagnosisState()
+    object History : DiagnosisState()
 }
 
 class DiagnosisViewModel: ViewModel(){
     companion object {
         private const val TRY_MAX_COUNT = 5
-        private const val TEXT_LOADING = "読み込み中..."
-        private const val TEXT_REQUEST_QUESTION = "今の気持ちの健康を数値化するはい/いいえで答えられる質問を9個考えて"
-        private const val TEXT_REQUEST_SCORE = "以下のユーザに対する評価の文からスコアを0-9999の範囲で一の位まで点数をつけて推測して必ず「XXXX」のように表して:"
-        private const val TEXT_REQUEST_ADVICE = "100文字以内でアドバイスして"
-        private const val TEXT_ERROR = "問題が発生しました。再度お試しください"
     }
 
     private val dao = RoomApplication.database.diagnosisDao()
     var historyList = mutableStateListOf<DiagnosisEntity>()
 
-    private var _diagnosisState = mutableStateOf(DiagnosisState.INIT)
-    val diagnosisState: DiagnosisState by _diagnosisState
+    private var _diagnosisState = mutableStateOf<DiagnosisState>(DiagnosisState.Init)
+    val diagnosisState: State<DiagnosisState> = _diagnosisState
 
     private var questions = mutableListOf<Question>()
-    private var count by mutableStateOf(0)
+    private var answerProgress by mutableStateOf(0)
 
-    private var _resultMessage = mutableStateOf(TEXT_LOADING)
+    private var _resultMessage = mutableStateOf("")
     val resultMessage: String by _resultMessage
 
     private var _resultScore = mutableStateOf(-1)
     val resultScore by _resultScore
 
-
     private var aiResponse = ""
 
-    fun startButtonPressed() {
-        if (diagnosisState == DiagnosisState.LOADING) { return }
+    fun startButtonPressed(
+        query: String,
+    ) {
+        if (diagnosisState.value is DiagnosisState.Loading) { return }
         viewModelScope.launch {
-                _diagnosisState.value = DiagnosisState.LOADING
+            _diagnosisState.value = DiagnosisState.Loading
             withContext(Dispatchers.IO) {
                 questions = mutableListOf()
-                createQuestion()
+                createQuestion(query)
             }
-            count = 0
-            _diagnosisState.value = DiagnosisState.STARTED
-            _resultMessage.value = TEXT_LOADING
+            _diagnosisState.value = DiagnosisState.Started
+            _resultMessage.value = ""
             _resultScore.value = -1
         }
     }
 
     fun historyButtonPressed() {
         if (historyList.isEmpty()) viewModelScope.launch { withContext(Dispatchers.IO) { loadHistory() } }
-        _diagnosisState.value = DiagnosisState.HISTORY
+        _diagnosisState.value = DiagnosisState.History
     }
 
     fun historyDeleteButtonPressed(diagnosis: DiagnosisEntity) {
@@ -93,33 +90,41 @@ class DiagnosisViewModel: ViewModel(){
         endDiagnosis()
     }
 
-    fun onClickYes() {
-        if (questions.size <= count) { return }
-        questions.getOrNull(count)?.answer = true
-        changeQuestion()
-    }
-    fun onClickNo() {
-        if (questions.size <= count) { return }
-        questions.getOrNull(count)?.answer = false
-        changeQuestion()
+    fun onClickAnswer(
+        bool: Boolean
+    ) {
+        if (questions.size <= answerProgress) { return }
+        questions.getOrNull(answerProgress)?.answer = bool
+        answerProgress++
     }
 
-    private fun changeQuestion() {
-        count++
+    fun currentQuestion(
+        queryMakeAdvice: String,
+        queryScoring: String,
+    ): String {
+        if (diagnosisState.value is DiagnosisState.Result) return ""
+        if (questions.size <= answerProgress) { showResult(
+            queryMakeAdvice = queryMakeAdvice,
+            queryScoring = queryScoring
+        ) }
+        return questions.getOrNull(answerProgress)?.question ?: ""
     }
 
-    fun currentQuestion(): String {
-        if (diagnosisState == DiagnosisState.RESULT) return TEXT_LOADING
-        if (questions.size <= count) { showResult() }
-        return questions.getOrNull(count)?.question ?: TEXT_LOADING
+    private fun showResult(
+        queryMakeAdvice: String,
+        queryScoring: String,
+    ) {
+        _diagnosisState.value = DiagnosisState.Result
+        resultString(
+            queryMakeAdvice = queryMakeAdvice,
+            queryScoring = queryScoring
+        )
     }
 
-    private fun showResult() {
-        _diagnosisState.value = DiagnosisState.RESULT
-        resultString()
-    }
-
-    private fun resultScore(message: String) {
+    private fun resultScore(
+        message: String,
+        queryScoring: String,
+    ) {
         val scores = mutableListOf(-1, -1, -1)
         for (i in 0..2) {
             viewModelScope.launch {
@@ -129,7 +134,7 @@ class DiagnosisViewModel: ViewModel(){
                         scores[i] = makeHttpRequest(
                             listOf(
                                 ChatMessage(
-                                    text = TEXT_REQUEST_SCORE + message,
+                                    text = queryScoring + message,
                                     isMe = true
                                 ),
                             )
@@ -150,7 +155,10 @@ class DiagnosisViewModel: ViewModel(){
             }
         }
     }
-    private fun resultString() {
+    private fun resultString(
+        queryMakeAdvice: String,
+        queryScoring: String,
+    ) {
         if (questions.isEmpty()) return
         val query = questions.mapIndexed { index, it ->
             "${index + 1}: Q:${it.question} A:${if (it.answer == true) "はい" else "いいえ"}\n"
@@ -161,30 +169,34 @@ class DiagnosisViewModel: ViewModel(){
                 while (_resultMessage.value.length !in 21..400) {
                     _resultMessage.value = makeHttpRequest(
                         listOf(
-                            ChatMessage(text = TEXT_REQUEST_QUESTION, isMe = true),
                             ChatMessage(text = aiResponse, isMe = false),
-                            ChatMessage(text = "$TEXT_REQUEST_ADVICE:$query\n", isMe = true),
+                            ChatMessage(text = "$queryMakeAdvice:$query\n", isMe = true),
                         )
                     )
                     tryCount--
                     if (tryCount <= 0) break
                 }
-                resultScore(_resultMessage.value)
+                resultScore(
+                    message = _resultMessage.value,
+                    queryScoring = queryScoring
+                )
             }
         }
     }
 
     private fun endDiagnosis() {
-        _diagnosisState.value = DiagnosisState.INIT
-        count = 0
-        _resultMessage.value = TEXT_LOADING
+        _diagnosisState.value = DiagnosisState.Init
+        answerProgress = 0
+        _resultMessage.value = ""
         _resultScore.value = -1
     }
 
-    private fun createQuestion() {
+    private fun createQuestion(
+        query: String,
+    ) {
         aiResponse = makeHttpRequest(
             listOf(
-                ChatMessage(text = TEXT_REQUEST_QUESTION, isMe = true)
+                ChatMessage(text = query, isMe = true)
             )
         )
         val questionListResponse = aiResponse.split("\n")
@@ -227,7 +239,7 @@ class DiagnosisViewModel: ViewModel(){
 
             val jsonInputString = """
                     {
-                        "model": "gpt-3.5-turbo",
+                        "model": "gpt-3.5-turbo-0613",
                         "messages": 
                         [${jsonInputStringContent.dropLast(1)}]
                         
@@ -252,7 +264,7 @@ class DiagnosisViewModel: ViewModel(){
             }
             if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 Log.d("ChatViewModel", "Error: ${stream.bufferedReader().use { it.readText() }}")
-                return TEXT_ERROR
+                return ""
             }
 
             val result = stream.bufferedReader().use { it.readText() }
@@ -264,7 +276,7 @@ class DiagnosisViewModel: ViewModel(){
             return message.getString("content")
         } catch (e: Exception) {
             println(e)
-            return "$TEXT_ERROR(${e.message})"
+            return ""
         }
     }
 

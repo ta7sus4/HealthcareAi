@@ -9,7 +9,10 @@
     <string name="thinking_question">質問を考えています...</string>
     <string name="result">結果</string>
     <string name="scoring">計算中...</string>
+    <string name="loading">読み込み中...</string>
+    <string name="thinking">考えています...</string>
     <string name="failed_fetch">取得に失敗しました</string>
+    <string name="error">問題が発生しました。再度お試しください。</string>
     <string name="score">スコア</string>
     <string name="yes">はい</string>
     <string name="no">いいえ</string>
@@ -17,4 +20,8 @@
     <string name="no_history">履歴はありません</string>
     <string name="history_not_enough">履歴が不足しています</string>
     <string name="delete_all">すべて消去</string>
+
+    <string name="query_make_question">今の気持ちの健康を数値化するはい/いいえで答えられる質問を9個考えて</string>
+    <string name="query_make_advice">100文字以内でアドバイスして</string>
+    <string name="query_scoring">以下のユーザに対する評価の文からスコアを0–9999の範囲で一の位まで点数をつけて推測して必ず「XXXX」のように表して:</string>
 </resources>

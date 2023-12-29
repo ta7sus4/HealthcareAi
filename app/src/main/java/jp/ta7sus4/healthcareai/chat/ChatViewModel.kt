@@ -14,21 +14,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class ChatViewModel: ViewModel() {
-
-    companion object{
-        private const val TEXT_FIRST_MESSAGE = "こんにちは！何かお困りですか？"
-        private const val TEXT_ERROR = "問題が発生しました。再度お試しください。"
-        private const val TEXT_THINKING = "考えています..."
-    }
-
-    var messages = mutableStateOf(listOf(ChatMessage(text = TEXT_FIRST_MESSAGE, isMe = false)))
+    var messages = mutableStateOf(listOf<ChatMessage>())
 
     private fun addMessage(message: ChatMessage) {
         messages.value = messages.value + message
-    }
-
-    private fun deleteLastMessage() {
-        messages.value = messages.value.dropLast(1)
     }
 
     fun sendButtonPressed(query: String){
@@ -41,7 +30,7 @@ class ChatViewModel: ViewModel() {
 
     private fun sendMessage(message: ChatMessage) {
         addMessage(message)
-        addMessage(ChatMessage(text = TEXT_THINKING, isMe = false))
+        addMessage(ChatMessage(text = "", isMe = false))
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 makeHttpRequest()
@@ -105,10 +94,7 @@ class ChatViewModel: ViewModel() {
 
             if (connection.responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 Log.d("ChatViewModel", "Error: ${stream.bufferedReader().use { it.readText() }}")
-                if (messages.value.last().text == TEXT_THINKING) {
-                    deleteLastMessage()
-                }
-                addMessage(ChatMessage(text = TEXT_ERROR + "(${stream.bufferedReader().use { it.readText() }})", isMe = false))
+                addMessage(ChatMessage(text = "(${stream.bufferedReader().use { it.readText() }})", isMe = false, isError = true))
                 return
             }
 
@@ -124,19 +110,13 @@ class ChatViewModel: ViewModel() {
                     val firstChoice = choices.getJSONObject(0)
                     val message = firstChoice.getJSONObject("delta")
                     val content = message.getString("content")
-                    var lastMessage = messages.value.last().text
-                    if (lastMessage == TEXT_THINKING){
-                        lastMessage = ""
-                    }
+                    val lastMessage = messages.value.last().text
                     messages.value = messages.value.dropLast(1) + ChatMessage(text = lastMessage + content, isMe = false)
                 }
             }
         } catch (e: Exception) {
             println(e)
-            if (messages.value.last().text == TEXT_THINKING) {
-                deleteLastMessage()
-            }
-            addMessage(ChatMessage(text = TEXT_ERROR + "(${e.message})", isMe = false))
+            addMessage(ChatMessage(text = "(${e.message})", isMe = false, isError = true))
             return
         }
     }
@@ -145,4 +125,5 @@ class ChatViewModel: ViewModel() {
 data class ChatMessage(
     val text: String,
     val isMe: Boolean,
+    val isError: Boolean = false
 )
