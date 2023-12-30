@@ -20,14 +20,14 @@ fun DiagnosisStartScreen(
     viewModel: DiagnosisViewModel,
     modifier: Modifier = Modifier,
 ) {
-    when (viewModel.diagnosisState) {
-        DiagnosisState.RESULT -> {
+    when (viewModel.diagnosisState.value) {
+        is DiagnosisState.Result -> {
             DiagnosisResultScreen(viewModel = viewModel)
         }
-        DiagnosisState.STARTED -> {
+        is DiagnosisState.Started -> {
             DiagnosisScreen(viewModel = viewModel)
         }
-        DiagnosisState.HISTORY -> {
+        is DiagnosisState.History -> {
             DiagnosisHistoryScreen(viewModel = viewModel)
         }
         else -> {
@@ -44,15 +44,18 @@ fun DiagnosisStartScreen(
                 Spacer(Modifier.weight(0.2f))
                 Text(text = stringResource(id = R.string.diagnosis_description))
                 Spacer(Modifier.weight(0.8f))
+                val query = stringResource(id = R.string.query_make_question)
                 HealthyButton(
-                    text = if (viewModel.diagnosisState == DiagnosisState.LOADING) stringResource(id = R.string.thinking_question) else stringResource(id = R.string.start_diagnosis),
-                    onClick = { viewModel.startButtonPressed() },
+                    text = if (viewModel.diagnosisState.value == DiagnosisState.Loading) stringResource(id = R.string.thinking_question) else stringResource(id = R.string.start_diagnosis),
+                    onClick = {
+                        viewModel.startButtonPressed(query = query)
+                    },
                 )
                 Spacer(Modifier.weight(0.2f))
                 HealthyButton(
                     text = stringResource(id = R.string.show_history),
                     onClick = { viewModel.historyButtonPressed() },
-                    enabled = viewModel.diagnosisState != DiagnosisState.LOADING,
+                    enabled = viewModel.diagnosisState.value !is DiagnosisState.Loading,
                 )
                 Spacer(Modifier.weight(0.6f))
             }

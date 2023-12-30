@@ -51,8 +51,13 @@ fun DiagnosisScreen(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
+        val queryMakeAdvice = stringResource(id = R.string.query_make_advice)
+        val queryScoring = stringResource(id = R.string.query_scoring)
         Text(
-            text = viewModel.currentQuestion(),
+            text = viewModel.currentQuestion(
+                queryMakeAdvice = queryMakeAdvice,
+                queryScoring = queryScoring
+            ),
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -65,9 +70,9 @@ fun DiagnosisScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Spacer(Modifier.weight(1f))
-            HealthyButton(text = stringResource(id = R.string.no), onClick = { viewModel.onClickNo() })
+            HealthyButton(text = stringResource(id = R.string.no), onClick = { viewModel.onClickAnswer(false) })
             Spacer(Modifier.weight(1f))
-            HealthyButton(text = " ${stringResource(id = R.string.yes)} ", onClick = { viewModel.onClickYes() })
+            HealthyButton(text = " ${stringResource(id = R.string.yes)} ", onClick = { viewModel.onClickAnswer(true) })
             Spacer(Modifier.weight(1f))
         }
         Spacer(modifier = Modifier.weight(0.5f))
